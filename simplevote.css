@@ -1,0 +1,9 @@
+.vote_star {
+ background-image: url("star_ico_small.png");	
+ background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: 50% 0; 
+}
+.vote_star:hover {    
+	 background-image: url("paper.gif");
+}
