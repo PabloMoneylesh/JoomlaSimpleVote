@@ -1,9 +1,32 @@
-.vote_star {
+.vote_star, .vote_star_active {
  background-image: url("star_ico_small.png");	
- background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: 50% 0; 
+ background-repeat: no-repeat;    
+	width: 16px;
+    height: 15px;
+    display: table-cell;	
+	cursor: pointer;
+/*	background-color:red;*/
+	    
 }
-.vote_star:hover {    
-	 background-image: url("paper.gif");
+
+.vote_star {
+    background-position: -16px 0; 
+}
+
+.vote_star_active {
+    background-position: 0 0; 
+}
+.vote_star:hover ~ .vote_star, 
+.vote_star:hover ~ .vote_star_active,
+.vote_star_active:hover ~ .vote_star,
+.vote_star_active:hover ~ .vote_star_active {    
+	 background-position: -16px 0; 
+}
+
+.vote_stars {	
+	height: 15px;
+	width: 80px;
+}
+.vote_stars:hover  > a {
+	 background-position: -32px 0; 
 }
