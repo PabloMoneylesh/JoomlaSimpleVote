@@ -58,12 +58,12 @@ class PlgContentSimplevote extends JPlugin
 			// Load plugin language files only when needed (ex: they are not needed if show_vote is not active).
 			$this->loadLanguage();
 
-			$rating = (int) @$row->rating;
-			$rating = 3;
+			$rating = (int) @$row->rating;			
 
 			$view = JFactory::getApplication()->input->getString('view', '');
 			$img = '';
 
+			$voteDiv = "<div class='vote_stars'>";
 			
 			// Look for images in template if available
 			$starImageOn  = JHtml::_('image', 'system/rating_star.png', JText::_('PLG_VOTE_STAR_ACTIVE'), $imgAttribs, true);
@@ -73,53 +73,23 @@ class PlgContentSimplevote extends JPlugin
 
 			for ($i = 0; $i < $rating; $i++)
 			{
-				$imgAttribs = array("onclick"=>"alert(".$i.");");
-				$imgAttribs = array("class"=>"vote_star");
-				$img .= JHtml::_('image', 'system/rating_star.png', JText::_('PLG_VOTE_STAR_ACTIVE'), $imgAttribs, true);
+				
+				$voteDiv .= "<a class='vote_star_active' value='1' onclick='submitVote(" . $i+1 . ");'></a>";
 			}
 
 			for ($i = $rating; $i < 5; $i++)
 			{
-				$imgAttribs = array("onclick"=>"alert(".$i.");");
-				$imgAttribs = array("class"=>"vote_star");
-				$img .= JHtml::_('image', 'system/rating_star_blank.png', JText::_('PLG_VOTE_STAR_INACTIVE'), $imgAttribs, true);
+				$voteDiv .= "<a class='vote_star' value='1' onclick='submitVote(" . $i+1 . ");'></a>";
 			}
+			$voteDiv .= "<span>". $rating ."</span>";
+			$voteDiv .= "</div>";
+			
+			$voteForm = "<form id='vote_form' method='post' action='http://www.phototravel.dp.ua/hitcount=0' class='form-inline'>";
+			$voteForm .= "<input type='hidden' name='user_rating' id='user_rating' value='0' />";
+			$voteForm .= "<input type='hidden' name='url' value='http' />";
+			$voteForm .= "</form>";
 
-			$html .= '<div class="content_rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">';
-			$html .= '<p class="unseen element-invisible">'
-					. JText::sprintf('PLG_VOTE_USER_RATING', '<span itemprop="ratingValue">' . $rating . '</span>', '<span itemprop="bestRating">5</span>')
-					. '<meta itemprop="ratingCount" content="' . (int) $row->rating_count . '" />'
-					. '<meta itemprop="worstRating" content="0" />'
-					. '</p>';
-			$html .= $img;
-			$html .= '</div>';
-
-			if ($view == 'article' && $row->state == 1)
-			{
-				$uri = clone JUri::getInstance();
-				$uri->setVar('hitcount', '0');
-
-				// Create option list for voting select box
-				$options = array();
-
-				for ($i = 1; $i < 6; $i++)
-				{
-					$options[] = JHtml::_('select.option', $i, JText::sprintf('PLG_VOTE_VOTE', $i));
-				}
-
-				// Generate voting form
-				$html .= '<form method="post" action="' . htmlspecialchars($uri->toString(), ENT_COMPAT, 'UTF-8') . '" class="form-inline">';
-				$html .= '<span class="content_vote">';
-				$html .= '<label class="unseen element-invisible" for="content_vote_' . $row->id . '">' . JText::_('PLG_VOTE_LABEL') . '</label>';
-				$html .= JHtml::_('select.genericlist', $options, 'user_rating', null, 'value', 'text', '5', 'content_vote_' . $row->id);
-				$html .= '&#160;<input class="btn btn-mini" type="submit" name="submit_vote" value="' . JText::_('PLG_VOTE_RATE') . '" />';
-				$html .= '<input type="hidden" name="task" value="article.vote" />';
-				$html .= '<input type="hidden" name="hitcount" value="0" />';
-				$html .= '<input type="hidden" name="url" value="' . htmlspecialchars($uri->toString(), ENT_COMPAT, 'UTF-8') . '" />';
-				$html .= JHtml::_('form.token');
-				$html .= '</span>';
-				$html .= '</form>';
-			}
+			$html .= $voteDiv . $voteForm;
 		}
 
 		return $html;
