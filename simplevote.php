@@ -9,6 +9,7 @@
 
 defined('_JEXEC') or die;
 
+
 /**
  * Vote plugin.
  *
@@ -16,25 +17,20 @@ defined('_JEXEC') or die;
  */
 class PlgContentSimplevote extends JPlugin
 {
-	function onContentAfterDisplay1($context, &$article, &$params, $limitstart)
+	public function onContentPrepare($context, &$article, &$params, $limitstart = 0)
 	{
-		
-		
-		return '<p>resultHERE</p>' ;
+		$document = JFactory::getDocument();
+		$document->addStyleSheet("plugins/content/simplevote/simplevote.css");
+		$document->addScript("plugins/content/simplevote/simplevote.js");
 	}
-	
-	public function onContentPrepare($context, &$row, &$params, $page = 0)
-{
-    $document = JFactory::getDocument();
-    $document->addStyleSheet("plugins/content/simplevote/simplevote.css");
-	$document->addScript("plugins/content/simplevote/simplevote.css");
-}
 
 	/**
-	 * Displays the voting area if in an article
+	 * Displays the voting area if in an article	 
 	 *
+	 * There is two display options - in article view and in categori. In categori voew there is less informations displayed. 
+	 *	 
 	 * @param   string   $context  The context of the content being passed to the plugin
-	 * @param   object   &$row     The article object
+	 * @param   object   &$article     The article object
 	 * @param   object   &$params  The article params
 	 * @param   integer  $page     The 'page' number
 	 *
@@ -42,54 +38,66 @@ class PlgContentSimplevote extends JPlugin
 	 *
 	 * @since   1.6
 	 */
-	public function onContentAfterDisplay($context, &$row, &$params, $page=0)
+	public function onContentAfterDisplay($context, &$article, &$params, $limitstart)	
 	{
+		
 		$parts = explode(".", $context);
 
 		if ($parts[0] != 'com_content')
 		{
 			return false;
 		}
+		$view   	= JRequest::getCmd('view');
 
-		$html = '';
+		$html = "<div class = 'simple_vote'>";
+		if($view == "article"){
+			$html .= "<div class = 'separator'></div>";
+			$html .= "<div class = 'vote_header'><span>Оцените статью:</span></div>";
+		}
+		$articleId = @$article->id;
+		$catid = @$article->catid;
+		$artRoute = ContentHelperRoute::getArticleRoute( $articleId, $catid);
+		
 
 		if (!empty($params) && $params->get('show_vote', null))
 		{
-			// Load plugin language files only when needed (ex: they are not needed if show_vote is not active).
-			$this->loadLanguage();
 
-			$rating = (int) @$row->rating;			
-
-			$view = JFactory::getApplication()->input->getString('view', '');
-			$img = '';
+			$rating = (int) @$article->rating;	
+			$ratingCount = (int) @$article->rating_count;
 
 			$voteDiv = "<div class='vote_stars'>";
-			
-			// Look for images in template if available
-			$starImageOn  = JHtml::_('image', 'system/rating_star.png', JText::_('PLG_VOTE_STAR_ACTIVE'), $imgAttribs, true);
-			$starImageOff = JHtml::_('image', 'system/rating_star_blank.png', JText::_('PLG_VOTE_STAR_INACTIVE'), $imgAttribs, true);
-			var_dump($starImageOn);
-			
 
 			for ($i = 0; $i < $rating; $i++)
-			{
-				
-				$voteDiv .= "<a class='vote_star_active' value='1' onclick='submitVote(" . $i+1 . ");'></a>";
+			{				
+				$voteDiv .= "<div class='vote_star_active' value='1' onclick='submitVote(" . ($i+1) . ", ". $articleId.");'></div>";
 			}
-
 			for ($i = $rating; $i < 5; $i++)
 			{
-				$voteDiv .= "<a class='vote_star' value='1' onclick='submitVote(" . $i+1 . ");'></a>";
-			}
-			$voteDiv .= "<span>". $rating ."</span>";
+				$voteDiv .= "<div class='vote_star' value='1' onclick='submitVote(" . ($i+1) . ", ". $articleId. ");'></div>";
+			}			
 			$voteDiv .= "</div>";
+			if($view == "article"){
+				$voteInf = "<span>рейтинг: ". $rating ."</span>";
+				$voteInf .= " <span>оценок: ". $ratingCount ."</span>";
+			}
 			
-			$voteForm = "<form id='vote_form' method='post' action='http://www.phototravel.dp.ua/hitcount=0' class='form-inline'>";
+			$uri = JUri::getInstance($artRoute);
+			$uri->setVar('hitcount', '0');
+			$currenturi = JUri::getInstance();
+			
+			$voteForm = "<form id='vote_form".$articleId."' method='post' action='". $uri ."' class='form-inline'>";
 			$voteForm .= "<input type='hidden' name='user_rating' id='user_rating' value='0' />";
-			$voteForm .= "<input type='hidden' name='url' value='http' />";
+			$voteForm .= "<input type='hidden' name='url' value='". $currenturi ."' />";
+			$voteForm .= "<input type='hidden' name='task' value='article.vote'>";
+			$voteForm .= JHtml::_('form.token');
 			$voteForm .= "</form>";
 
-			$html .= $voteDiv . $voteForm;
+			$html .= $voteDiv . $voteInf. $voteForm;
+			$html .= "</div>";
+			if($view == "article"){
+				$article->text .= $html;
+				return;
+			}
 		}
 
 		return $html;

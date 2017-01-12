@@ -1,3 +1,17 @@
+.simple_vote {
+	//margin: 10px 0 0 0;
+}
+.separator{
+    height: 1px;
+    background-color: gray;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.vote_header {
+	display: inline-block;
+	
+}
+
 .vote_star, .vote_star_active {
  background-image: url("star_ico_small.png");	
  background-repeat: no-repeat;    
@@ -5,7 +19,7 @@
     height: 15px;
     display: table-cell;	
 	cursor: pointer;
-/*	background-color:red;*/
+	
 	    
 }
 
@@ -26,7 +40,9 @@
 .vote_stars {	
 	height: 15px;
 	width: 80px;
+	display: inline-block;
+	margin: 0 10px 0 10px;
 }
-.vote_stars:hover  > a {
+.vote_stars:hover  > div {
 	 background-position: -32px 0; 
 }
