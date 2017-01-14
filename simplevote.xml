@@ -15,4 +15,69 @@
 		<filename>simplevote.js</filename>
 		<filename>star_ico_small.png</filename>
 	</files>
+	<config>
+		<fields name="params">
+ 
+			<fieldset name="basic">
+			
+				<field name="position" type="list"
+					default="before"
+					description="Position of the voting block"
+					label="Position"
+				>
+					<option value="before">before article</option>
+					<option value="after">after article</option>
+					
+				</field>
+				 
+				<field name="categoryViewDisplay" type="radio"
+					default="1"
+					description="Display voting in categories"
+					label="Display in category"
+				>
+					<option value="1">JON</option>
+					<option value="0">JOFF</option>
+					
+				</field>
+ 
+				<field name="rateNumberDisplay" type="radio"
+					default="1"
+					description="Display number value of rating"
+					label="Display rate number"
+				>
+					<option value="1">JON</option>
+					<option value="0">JOFF</option>
+				</field>
+				
+				<field name="rateCountDisplay" type="radio"
+					default="1"
+					description="Display count number of voting"
+					label="Display rate count"
+				>
+					<option value="1">JON</option>
+					<option value="0">JOFF</option>					
+				</field>
+			</fieldset>
+			
+			<fieldset name="Advanced">
+				<field name="vriteToArticleBody" type="radio"
+					default="0"
+					description="Allows to add voting code to article body (not just after article). Because of some pludins do this and in this case voting plugin can't be placed on first place after article text"
+					label="Add voting to article body"
+				>
+					<option value="1">JON</option>
+					<option value="0">JOFF</option>					
+				</field>
+				<field name="addSeparator" type="radio"
+					default="0"
+					description="Add thin line before voting block"
+					label="Add line before"
+				>
+					<option value="1">JON</option>
+					<option value="0">JOFF</option>					
+				</field>
+			</fieldset>
+ 
+		</fields>
+	</config>
 </extension>

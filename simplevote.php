@@ -23,6 +23,27 @@ class PlgContentSimplevote extends JPlugin
 		$document->addStyleSheet("plugins/content/simplevote/simplevote.css");
 		$document->addScript("plugins/content/simplevote/simplevote.js");
 	}
+	
+	public function onContentBeforeDisplay($context, &$article, &$params, $limitstart)	
+	{
+		$position = $this->params->get('position');
+		if($position=='before'){
+			$html = $this->createVoting($context, &$article, &$params, $limitstart);
+			return $html;
+		}
+		return false;
+		
+	}
+	public function onContentAfterDisplay($context, &$article, &$params, $limitstart)	
+	{
+		$position = $this->params->get('position');
+		if($position=='after'){
+			$html = $this->createVoting($context, &$article, &$params, $limitstart);
+			return $html;
+		}
+		return false;
+		
+	}
 
 	/**
 	 * Displays the voting area if in an article	 
@@ -38,20 +59,33 @@ class PlgContentSimplevote extends JPlugin
 	 *
 	 * @since   1.6
 	 */
-	public function onContentAfterDisplay($context, &$article, &$params, $limitstart)	
-	{
+	function createVoting($context, &$article, &$params, $limitstart)	
+	{	
+		$categoryViewDisplay = $this->params->get('categoryViewDisplay');
+		$rateNumberDisplay = $this->params->get('rateNumberDisplay');
+		$rateCountDisplay = $this->params->get('rateCountDisplay');
+		$vriteToArticleBody = $this->params->get('vriteToArticleBody');
+		$addSeparator = $this->params->get('addSeparator');
 		
+		
+		$view   	= JRequest::getCmd('view');
+				
 		$parts = explode(".", $context);
 
 		if ($parts[0] != 'com_content')
 		{
 			return false;
 		}
-		$view   	= JRequest::getCmd('view');
+		if($view == "category" && !$categoryViewDisplay){
+			return false;
+		}
+		
 
 		$html = "<div class = 'simple_vote'>";
 		if($view == "article"){
-			$html .= "<div class = 'separator'></div>";
+			if($addSeparator){
+				$html .= "<div class = 'separator'></div>";
+			}
 			$html .= "<div class = 'vote_header'><span>Оцените статью:</span></div>";
 		}
 		$articleId = @$article->id;
@@ -61,7 +95,6 @@ class PlgContentSimplevote extends JPlugin
 
 		if (!empty($params) && $params->get('show_vote', null))
 		{
-
 			$rating = (int) @$article->rating;	
 			$ratingCount = (int) @$article->rating_count;
 
@@ -77,8 +110,12 @@ class PlgContentSimplevote extends JPlugin
 			}			
 			$voteDiv .= "</div>";
 			if($view == "article"){
-				$voteInf = "<span>рейтинг: ". $rating ."</span>";
-				$voteInf .= " <span>оценок: ". $ratingCount ."</span>";
+				if($rateNumberDisplay){
+					$voteInf = "<span>рейтинг: ". $rating ."</span>";
+				}
+				if($rateCountDisplay){
+					$voteInf .= " <span>оценок: ". $ratingCount ."</span>";
+				}
 			}
 			
 			$uri = JUri::getInstance($artRoute);
@@ -94,7 +131,7 @@ class PlgContentSimplevote extends JPlugin
 
 			$html .= $voteDiv . $voteInf. $voteForm;
 			$html .= "</div>";
-			if($view == "article"){
+			if($view == "article" && $vriteToArticleBody){
 				$article->text .= $html;
 				return;
 			}
