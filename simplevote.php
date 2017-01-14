@@ -9,12 +9,6 @@
 
 defined('_JEXEC') or die;
 
-
-/**
- * Vote plugin.
- *
- * @since  1.5
- */
 class PlgContentSimplevote extends JPlugin
 {
 	public function onContentPrepare($context, &$article, &$params, $limitstart = 0)
@@ -24,25 +18,24 @@ class PlgContentSimplevote extends JPlugin
 		$document->addScript("plugins/content/simplevote/simplevote.js");
 	}
 	
-	public function onContentBeforeDisplay($context, &$article, &$params, $limitstart)	
+	public function onContentBeforeDisplay($context, &$article, $params, $limitstart)	
 	{
 		$position = $this->params->get('position');
 		if($position=='before'){
-			$html = $this->createVoting($context, &$article, &$params, $limitstart);
+			$html = $this->createVoting($context, $article, $params, $limitstart);
 			return $html;
 		}
-		return false;
-		
+		return '';
 	}
-	public function onContentAfterDisplay($context, &$article, &$params, $limitstart)	
+	
+	public function onContentAfterDisplay($context, &$article, $params, $limitstart)	
 	{
 		$position = $this->params->get('position');
 		if($position=='after'){
-			$html = $this->createVoting($context, &$article, &$params, $limitstart);
+			$html = $this->createVoting($context, $article, $params, $limitstart);
 			return $html;
 		}
-		return false;
-		
+		return '';
 	}
 
 	/**
@@ -59,14 +52,13 @@ class PlgContentSimplevote extends JPlugin
 	 *
 	 * @since   1.6
 	 */
-	function createVoting($context, &$article, &$params, $limitstart)	
+	function createVoting($context, &$article, $params, $limitstart)	
 	{	
 		$categoryViewDisplay = $this->params->get('categoryViewDisplay');
 		$rateNumberDisplay = $this->params->get('rateNumberDisplay');
 		$rateCountDisplay = $this->params->get('rateCountDisplay');
 		$vriteToArticleBody = $this->params->get('vriteToArticleBody');
 		$addSeparator = $this->params->get('addSeparator');
-		
 		
 		$view   	= JRequest::getCmd('view');
 				
@@ -137,7 +129,7 @@ class PlgContentSimplevote extends JPlugin
 			$html .= $voteDiv . $voteInf. $voteForm;
 			$html .= "</div>";
 			if($view == "article" && $vriteToArticleBody){
-				$article->text .= $html;
+				$article->text .= $html;				
 				return;
 			}
 		return $html;
