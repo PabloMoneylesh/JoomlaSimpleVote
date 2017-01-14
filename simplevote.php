@@ -78,26 +78,31 @@ class PlgContentSimplevote extends JPlugin
 		}
 		if($view == "category" && !$categoryViewDisplay){
 			return false;
-		}
-		
+		}	
 
-		$html = "<div class = 'simple_vote'>";
-		if($view == "article"){
-			if($addSeparator){
-				$html .= "<div class = 'separator'></div>";
-			}
-			$html .= "<div class = 'vote_header'><span>Оцените статью:</span></div>";
-		}
-		$articleId = @$article->id;
-		$catid = @$article->catid;
-		$artRoute = ContentHelperRoute::getArticleRoute( $articleId, $catid);
+		$html ="";		
 		
 
 		if (!empty($params) && $params->get('show_vote', null))
 		{
 			$rating = (int) @$article->rating;	
 			$ratingCount = (int) @$article->rating_count;
-
+			
+			$articleId = @$article->id;
+			$catid = @$article->catid;
+			$artRoute = ContentHelperRoute::getArticleRoute( $articleId, $catid);
+			
+			$html = "<div class = 'simple_vote' itemprop='aggregateRating' itemscope itemtype='http://schema.org/AggregateRating'>";
+			
+			$html .=$this->createMicrodata($rating, $ratingCount);
+		
+			if($view == "article"){
+				if($addSeparator){
+					$html .= "<div class = 'separator'></div>";
+				}
+				$html .= "<div class = 'vote_header'><span>Оцените статью:</span></div>";
+			}
+			
 			$voteDiv = "<div class='vote_stars'>";
 
 			for ($i = 0; $i < $rating; $i++)
@@ -135,8 +140,17 @@ class PlgContentSimplevote extends JPlugin
 				$article->text .= $html;
 				return;
 			}
+		return $html;
 		}
 
+		return false;
+	}
+	
+	function createMicrodata($rating, $ratingCount){
+		$html = "<meta itemprop='bestRating' content='5'>";
+		$html .= "<meta itemprop='worstRating' content='1'>";
+		$html .= "<meta itemprop='ratingValue' content='".$rating."'>";
+		$html .= "<meta itemprop='ratingCount' content='".$ratingCount."'>";
 		return $html;
 	}
 }
