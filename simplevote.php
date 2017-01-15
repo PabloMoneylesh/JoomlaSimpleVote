@@ -9,33 +9,51 @@
 
 defined('_JEXEC') or die;
 
+
+
+/**
+ * Vote plugin.
+ *
+ * @since  1.5
+ */
 class PlgContentSimplevote extends JPlugin
 {
 	public function onContentPrepare($context, &$article, &$params, $limitstart = 0)
 	{
+		
+		if (!JFactory::getApplication()->isSite()) {
+			return;
+		}
 		$document = JFactory::getDocument();
 		$document->addStyleSheet("plugins/content/simplevote/simplevote.css");
 		$document->addScript("plugins/content/simplevote/simplevote.js");
 	}
 	
-	public function onContentBeforeDisplay($context, &$article, $params, $limitstart)	
+	public function onContentBeforeDisplay($context, &$article, $params, $limitstart = 0)	
 	{
+		if (!JFactory::getApplication()->isSite()) {
+			return;
+		}
 		$position = $this->params->get('position');
 		if($position=='before'){
 			$html = $this->createVoting($context, $article, $params, $limitstart);
 			return $html;
 		}
-		return '';
+		return false;
+		
 	}
-	
-	public function onContentAfterDisplay($context, &$article, $params, $limitstart)	
+	public function onContentAfterDisplay($context, &$article, $params, $limitstart = 0)	
 	{
+		if (!JFactory::getApplication()->isSite()) {
+			return;
+		}
 		$position = $this->params->get('position');
 		if($position=='after'){
 			$html = $this->createVoting($context, $article, $params, $limitstart);
 			return $html;
 		}
-		return '';
+		return false;
+		
 	}
 
 	/**
@@ -54,11 +72,13 @@ class PlgContentSimplevote extends JPlugin
 	 */
 	function createVoting($context, &$article, $params, $limitstart)	
 	{	
+	
 		$categoryViewDisplay = $this->params->get('categoryViewDisplay');
 		$rateNumberDisplay = $this->params->get('rateNumberDisplay');
 		$rateCountDisplay = $this->params->get('rateCountDisplay');
 		$vriteToArticleBody = $this->params->get('vriteToArticleBody');
 		$addSeparator = $this->params->get('addSeparator');
+		
 		
 		$view   	= JRequest::getCmd('view');
 				
@@ -117,7 +137,7 @@ class PlgContentSimplevote extends JPlugin
 			
 			$uri = JUri::getInstance($artRoute);
 			$uri->setVar('hitcount', '0');
-			$currenturi = JUri::getInstance();
+			$currenturi = JUri::getInstance();			
 			
 			$voteForm = "<form id='vote_form".$articleId."' method='post' action='". $uri ."' class='form-inline'>";
 			$voteForm .= "<input type='hidden' name='user_rating' id='user_rating' value='0' />";
